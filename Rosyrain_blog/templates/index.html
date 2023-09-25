@@ -15,7 +15,7 @@
 
                         <header class="post-header">
                             <h1 class="post-title" itemprop="name headline">
-                                <a class="post-title-link" href="http://www.geerniya.cn/blog/5/" itemprop="url">
+                                <a class="post-title-link" href="{% url 'blog:blog_id' blog.id %}" itemprop="url">
                                     {{ blog.title }}
                                 </a>
                             </h1>
@@ -46,7 +46,7 @@
                 <span class="post-meta-item-text">分类于</span>
 
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                    <a href="{% url 'blog:category' blog.category.name%}" itemprop="url" rel="index">
+                    <a href="{% url 'blog:category_name' blog.category.name %}" itemprop="url" rel="index">
                         <span itemprop="name">{{ blog.category.name }}</span>
                     </a>
                 </span>
@@ -60,7 +60,7 @@
                         <div class="post-body" itemprop="articleBody">
                         {{ blog.content|safe }}
                             <div class="post-button text-center">
-                                <a class="btn" href="http://www.geerniya.cn/blog/5/" rel="contents">
+                                <a class="btn" href="{% url 'blog:blog_id' blog.id %}" rel="contents">
                                     阅读全文 »
                                 </a>
                             </div>

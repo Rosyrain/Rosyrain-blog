@@ -63,3 +63,17 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.content[:10]
+
+class Counts(models.Model):
+    """
+    统计博客、分类和标签的数目
+    """
+    blog_nums = models.IntegerField(verbose_name='博客数目', default=0)
+    category_nums = models.IntegerField(verbose_name='分类数目', default=0)
+    tag_nums = models.IntegerField(verbose_name='标签数目', default=0)
+    visit_nums = models.IntegerField(verbose_name='网站访问量', default=0)
+
+
+    class Meta:
+        verbose_name = '数目统计'
+        verbose_name_plural = verbose_name

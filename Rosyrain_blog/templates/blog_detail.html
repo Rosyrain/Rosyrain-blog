@@ -30,7 +30,7 @@
                         </span>
                         <span class="post-meta-item-text">分类于</span>
                         <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                            <a href="{% url 'blog:category' blog.category.name%}" itemprop="url" rel="index">
+                            <a href="{% url 'blog:category_name' blog.category.name %}" itemprop="url" rel="index">
                                 <span itemprop="name">{{ blog.category }}</span>
                             </a>
                         </span>
@@ -66,16 +66,16 @@
 
                                 <div id="wechat" style="display: inline-block">
                                     <a href="./尝试一个很短的博客_files/weixin.jpg" class="fancybox" rel="group"><img
-                                            id="wechat_qr" src="./尝试一个很短的博客_files/weixin.jpg"
-                                            alt="geerniya WeChat Pay"></a>
+                                            id="wechat_qr" src="#"
+                                            alt="Rosyrain WeChat Pay"></a>
                                     <p>微信打赏</p>
                                 </div>
 
 
                                 <div id="alipay" style="display: inline-block">
                                     <a href="./尝试一个很短的博客_files/zhifubao.jpg" class="fancybox" rel="group"><img
-                                            id="alipay_qr" src="./尝试一个很短的博客_files/zhifubao.jpg"
-                                            alt="geerniya Alipay"></a>
+                                            id="alipay_qr" src="#"
+                                            alt="Rosyrain Alipay"></a>
                                     <p>支付宝打赏</p>
                                 </div>
 
@@ -117,39 +117,50 @@
             </div>
 
             <div class="post-spread"></div>
+            <div id="vcomments"></div>
+            <script>
+                new Valine({
+                    el: '#vcomments',
+                    appId: 'xBsla2crsqd8CHUPHmgwZSom-gzGzoHsz',
+                    appKey: 'XWVp08ayYNrtyTkQGoizclMn'
+                })
+            </script>
+
         </div>
     </div>
+
 {% endblock content %}
 
 
+
 {% block content_js %}
-<script>
-    $(function(){
-        $('#jsStayBtn').on('click', function(){
+    <script>
+        $(function () {
+            $('#jsStayBtn').on('click', function () {
 
-            $.ajax({
-                cache: false,
-                type: "POST",
-                url:"/add_comment/",
-                data:$('#jsStayForm').serialize(),
-                dateType:"json",
-                async: true,
-                beforeSend:function(xhr, settings){
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-            },
-                success: function(data) {
-                    if(data.status == 'success'){
-                        alert("提交成功");
-                         window.location.reload();//刷新当前页面.
-                    }else if(data.status == 'fail'){
-                        alert("评论错误，请重新评论");
-                    }
-                },
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "/add_comment/",
+                    data: $('#jsStayForm').serialize(),
+                    dateType: "json",
+                    async: true,
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            alert("提交成功");
+                            window.location.reload();//刷新当前页面.
+                        } else if (data.status == 'fail') {
+                            alert("评论错误，请重新评论");
+                        }
+                    },
+                });
             });
-        });
-    })
+        })
 
-</script>
+    </script>
 {% endblock %}
 
 <div class="content-wrap-comment">
@@ -176,20 +187,20 @@
         <button class="btn" type="button" id="jsStayBtn" value="发表">发表</button>
     </form>
 
-        {% for comment in all_comment %}
-            <li class="comment-item">
-            <hr class="the-line"  />
-                <span class="nickname">{{ comment.name }} - </span>
-                <time class="submit-date"
-                      datetime="{{ comment.create_time }}">{{ comment.create_time|date:"Y/m/d   h:m" }}</time>
-                <p class="floor">{{ forloop.counter }} #  </p>
-                <div style="word-wrap: break-word">
-                        {{ comment.content }}
-                </div>
+    {% for comment in all_comment %}
+        <li class="comment-item">
+            <hr class="the-line"/>
+            <span class="nickname">{{ comment.name }} - </span>
+            <time class="submit-date"
+                  datetime="{{ comment.create_time }}">{{ comment.create_time|date:"Y/m/d   h:m" }}</time>
+            <p class="floor">{{ forloop.counter }} # </p>
+            <div style="word-wrap: break-word">
+                {{ comment.content }}
+            </div>
 
-            </li>
-        {% empty %}
-            暂无评论
-        {% endfor %}
+        </li>
+    {% empty %}
+        暂无评论
+    {% endfor %}
 </div>
 

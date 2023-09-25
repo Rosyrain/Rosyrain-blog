@@ -1,23 +1,27 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
-from .models import Blog, Tag, Category,Comment
+from .models import Blog, Tag, Category,Comment,Counts
 from markdown import *
 from pure_pagination import PageNotAnInteger, Paginator
 from  apps.blog.forms import CommentForm
-
+from Rosyrain_blog.settings import HAYSTACK_SEARCH_RESULTS_PER_PAGE
+from haystack.views import SearchView
 # Create your views here.
 
 class IndexView(View):
     def get(self, request):
         all_blog = Blog.objects.all().order_by('-id')
-        all_category = Category.objects.all()
-        all_tag = Tag.objects.all()
+        count_nums = Counts.objects.get(id=1)
+        blog_nums = count_nums.blog_nums
+        cate_nums = count_nums.category_nums
+        tag_nums = count_nums.tag_nums
         for blog in all_blog:
             blog.content = markdown(blog.content, extensions=[
                 'markdown.extensions.extra',
                 'markdown.extensions.codehilite',
                 'markdown.extensions.toc',
+
             ])
 
         try:
@@ -29,6 +33,9 @@ class IndexView(View):
 
         context = {
             'all_blog': all_blog,
+            'blog_nums':blog_nums,
+            'cate_nums':cate_nums,
+            'tag_nums':tag_nums,
         }
         print('all_bolg:', all_blog)
         return render(request, 'index.html', context)
@@ -37,8 +44,10 @@ class IndexView(View):
 class ArchiveView(View):
     def get(self, request):
         all_blog = Blog.objects.all().order_by('-id')
-        all_category = Category.objects.all()
-        all_tag = Tag.objects.all()
+        count_nums = Counts.objects.get(id=1)
+        blog_nums = count_nums.blog_nums
+        cate_nums = count_nums.category_nums
+        tag_nums = count_nums.tag_nums
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
@@ -48,53 +57,74 @@ class ArchiveView(View):
 
         context = {
             'all_blog': all_blog,
-            'all_category': all_category,
-            'all_tag': all_tag,
+            'blog_nums':blog_nums,
+            'cate_nums':cate_nums,
+            'tag_nums':tag_nums,
         }
         return render(request, 'archive.html', context)
 
 
 class TagView(View):
     def get(self, request):
-        all_blog = Blog.objects.all().order_by('-id')
-        all_category = Category.objects.all()
+        count_nums = Counts.objects.get(id=1)
+        blog_nums = count_nums.blog_nums
+        cate_nums = count_nums.category_nums
+        tag_nums = count_nums.tag_nums
         all_tag = Tag.objects.all()
+
+
         context = {
-            'all_blog': all_blog,
-            'all_category': all_category,
+            'blog_nums':blog_nums,
+            'cate_nums':cate_nums,
+            'tag_nums':tag_nums,
             'all_tag': all_tag,
         }
 
         return render(request, 'tags.html', context)
 
 
+class CategoryView(View):
+    def get(self, request):
+        count_nums = Counts.objects.get(id=1)
+        blog_nums = count_nums.blog_nums
+        cate_nums = count_nums.category_nums
+        tag_nums = count_nums.tag_nums
+        all_cate = Category.objects.all()
+        context = {
+            'blog_nums':blog_nums,
+            'cate_nums':cate_nums,
+            'tag_nums':tag_nums,
+            'all_cate': all_cate,
+        }
+
+        return render(request, 'category.html', context)
+
+
 class TagDetailView(View):
     def get(self, request, tag_name):
-        all_blog = Blog.objects.all().order_by('-id')
-        all_category = Category.objects.all()
-        all_tag = Tag.objects.all()
+        count_nums = Counts.objects.get(id=1)
+        blog_nums = count_nums.blog_nums
+        cate_nums = count_nums.category_nums
+        tag_nums = count_nums.tag_nums
 
         tag = Tag.objects.filter(name=tag_name).first()
         tag_blogs = tag.blog_set.all()
 
-        for blog in all_blog:
-            blog.content = markdown(blog.content, extensions=[
-                'markdown.extensions.extra',
-                'markdown.extensions.codehilite',
-                'markdown.extensions.toc',
-            ])
-
+        # 分页
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:
             page = 1
-        p = Paginator(all_blog, 5, request=request)  # 每页展示5篇
-        all_blog = p.page(page)
+
+        p = Paginator(tag_blogs, 5, request=request)
+        tag_blogs = p.page(page)
+
+        #print(tag_blogs)
 
         context = {
-            'all_blog': all_blog,
-            'all_category': all_category,
-            'all_tag': all_tag,
+            'blog_nums':blog_nums,
+            'cate_nums':cate_nums,
+            'tag_nums':tag_nums,
             'tag_name': tag_name,
             'tag_blogs': tag_blogs,
         }
@@ -104,6 +134,12 @@ class TagDetailView(View):
 
 class BlogDetailView(View):
     def get(self, request, blog_id):
+        count_nums = Counts.objects.get(id=1)
+        blog_nums = count_nums.blog_nums
+        cate_nums = count_nums.category_nums
+        tag_nums = count_nums.tag_nums
+
+
         blog = Blog.objects.get(id=blog_id)
         all_comment = Comment.objects.all()
         blog.content = markdown(blog.content, extensions=[
@@ -139,6 +175,9 @@ class BlogDetailView(View):
             'has_prev': has_prev,
             'has_next': has_next,
             'all_comment':all_comment,
+            'blog_nums': blog_nums,
+            'cate_nums': cate_nums,
+            'tag_nums': tag_nums,
 
         }
         return render(request, 'blog_detail.html', context)
@@ -154,8 +193,13 @@ class AddCommentView(View):
             return HttpResponse('{"status": "fail"}', content_type='application/json')
 
 
-class CategoryDetaiView(View):
+class CategoryDetailView(View):
     def get(self, request, category_name):
+        count_nums = Counts.objects.get(id=1)
+        blog_nums = count_nums.blog_nums
+        cate_nums = count_nums.category_nums
+        tag_nums = count_nums.tag_nums
+
         category = Category.objects.filter(name=category_name).first()
         cate_blogs = category.blog_set.all()
 
@@ -171,6 +215,30 @@ class CategoryDetaiView(View):
         context = {
             'cate_blogs': cate_blogs,
             'category_name': category_name,
+            'blog_nums': blog_nums,
+            'cate_nums': cate_nums,
+            'tag_nums': tag_nums,
+
         }
 
         return render(request, 'category_detail.html',context )
+
+class MySearchView(SearchView):
+
+    def build_page(self):
+        #分页重写
+        super(MySearchView, self).extra_context()
+
+        try:
+            page_no = int(self.request.GET.get('page', 1))
+        except PageNotAnInteger:
+            raise HttpResponse("Not a valid number for page.")
+
+        if page_no < 1:
+            raise HttpResponse("Pages should be 1 or greater.")
+
+
+        paginator = Paginator(self.results, HAYSTACK_SEARCH_RESULTS_PER_PAGE, request=self.request)
+        page = paginator.page(page_no)
+
+        return (paginator, page)

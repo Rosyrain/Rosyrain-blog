@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.blog',
     'pure_pagination',
-    'haystack',
+    # 'haystack',
 ]
 
 #分页配置
@@ -142,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'blog.whoosh_cn_backend.WhooshEngine',
+        'ENGINE': 'apps.blog.whoosh_cn_backend.WhooshEngine',
         'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
     },
 }
