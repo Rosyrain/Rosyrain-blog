@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+
+
 {% block title %}{{ blog.title }}{% endblock title %}
 {% block content %}
     <div class="content-wrap">
@@ -36,16 +38,28 @@
                         </span>
                     </span>
 
-                            <span class="post-comments-count">
-                        <span class="post-meta-divider">|</span>
-                        <span class="post-meta-item-icon">
-                            <i class="fa fa-comment-o"></i>
+                            <span class="post-time">
+                                <span class="post-meta-divider">|</span>
+
+                            <span class="post-meta-item-icon">
+                            <i class="menu-item-icon fa fa-search"></i>
                         </span>
-                        <a class="cloud-tie-join-count" href="http://www.geerniya.cn/blog/4/#comment"
-                           itemprop="discussionUrl">
-                            <span class="post-comments-count join-count" itemprop="commentCount"></span>
-                        </a>
-                    </span>
+                        <span class="post-meta-item-text">博客访问量：</span>
+                        <time title="Post created" itemprop="dateCreated datePublished" datetime="#">
+                            {{ blog.click_count }}
+                        </time>
+                  </span>
+
+                            {#                            <span class="post-comments-count">#}
+                            {#                        <span class="post-meta-divider">|</span>#}
+                            {#                        <span class="post-meta-item-icon">#}
+                            {#                            <i class="fa fa-comment-o"></i>#}
+                            {#                        </span>#}
+                            {#                        <a class="cloud-tie-join-count" href="http://www.geerniya.cn/blog/4/#comment"#}
+                            {#                           itemprop="discussionUrl">#}
+                            {#                            <span class="post-comments-count join-count" itemprop="commentCount"></span>#}
+                            {#                        </a>#}
+                            {#                    </span>#}
 
                         </div>
                     </header>

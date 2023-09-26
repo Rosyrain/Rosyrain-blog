@@ -1,12 +1,14 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
-from .models import Blog, Tag, Category,Comment,Counts
+from .models import Blog, Tag, Category, Comment, Counts
 from markdown import *
 from pure_pagination import PageNotAnInteger, Paginator
-from  apps.blog.forms import CommentForm
+from apps.blog.forms import CommentForm
 from Rosyrain_blog.settings import HAYSTACK_SEARCH_RESULTS_PER_PAGE
 from haystack.views import SearchView
+
+
 # Create your views here.
 
 class IndexView(View):
@@ -16,6 +18,7 @@ class IndexView(View):
         blog_nums = count_nums.blog_nums
         cate_nums = count_nums.category_nums
         tag_nums = count_nums.tag_nums
+        visit_nums = count_nums.visit_nums
         for blog in all_blog:
             blog.content = markdown(blog.content, extensions=[
                 'markdown.extensions.extra',
@@ -33,11 +36,17 @@ class IndexView(View):
 
         context = {
             'all_blog': all_blog,
-            'blog_nums':blog_nums,
-            'cate_nums':cate_nums,
-            'tag_nums':tag_nums,
+            'blog_nums': blog_nums,
+            'cate_nums': cate_nums,
+            'tag_nums': tag_nums,
+            'visit_nums': visit_nums,
+            'page': 'home',
         }
-        print('all_bolg:', all_blog)
+        # print('all_bolg:', all_blog)
+        # 此处为主页
+        count_nums.visit_nums += 1
+        count_nums.save()
+
         return render(request, 'index.html', context)
 
 
@@ -57,9 +66,10 @@ class ArchiveView(View):
 
         context = {
             'all_blog': all_blog,
-            'blog_nums':blog_nums,
-            'cate_nums':cate_nums,
-            'tag_nums':tag_nums,
+            'blog_nums': blog_nums,
+            'cate_nums': cate_nums,
+            'tag_nums': tag_nums,
+            'page': 'archive',
         }
         return render(request, 'archive.html', context)
 
@@ -72,12 +82,12 @@ class TagView(View):
         tag_nums = count_nums.tag_nums
         all_tag = Tag.objects.all()
 
-
         context = {
-            'blog_nums':blog_nums,
-            'cate_nums':cate_nums,
-            'tag_nums':tag_nums,
+            'blog_nums': blog_nums,
+            'cate_nums': cate_nums,
+            'tag_nums': tag_nums,
             'all_tag': all_tag,
+            'page': 'tags',
         }
 
         return render(request, 'tags.html', context)
@@ -91,9 +101,9 @@ class CategoryView(View):
         tag_nums = count_nums.tag_nums
         all_cate = Category.objects.all()
         context = {
-            'blog_nums':blog_nums,
-            'cate_nums':cate_nums,
-            'tag_nums':tag_nums,
+            'blog_nums': blog_nums,
+            'cate_nums': cate_nums,
+            'tag_nums': tag_nums,
             'all_cate': all_cate,
         }
 
@@ -119,12 +129,12 @@ class TagDetailView(View):
         p = Paginator(tag_blogs, 5, request=request)
         tag_blogs = p.page(page)
 
-        #print(tag_blogs)
+        # print(tag_blogs)
 
         context = {
-            'blog_nums':blog_nums,
-            'cate_nums':cate_nums,
-            'tag_nums':tag_nums,
+            'blog_nums': blog_nums,
+            'cate_nums': cate_nums,
+            'tag_nums': tag_nums,
             'tag_name': tag_name,
             'tag_blogs': tag_blogs,
         }
@@ -138,7 +148,6 @@ class BlogDetailView(View):
         blog_nums = count_nums.blog_nums
         cate_nums = count_nums.category_nums
         tag_nums = count_nums.tag_nums
-
 
         blog = Blog.objects.get(id=blog_id)
         all_comment = Comment.objects.all()
@@ -174,12 +183,18 @@ class BlogDetailView(View):
             'blog_next': blog_next,
             'has_prev': has_prev,
             'has_next': has_next,
-            'all_comment':all_comment,
+            'all_comment': all_comment,
             'blog_nums': blog_nums,
             'cate_nums': cate_nums,
             'tag_nums': tag_nums,
 
         }
+
+        # 此处为博客详情页
+        # 博客点击数+1, 评论数统计
+        blog.click_count += 1
+        blog.save()
+
         return render(request, 'blog_detail.html', context)
 
 
@@ -221,12 +236,13 @@ class CategoryDetailView(View):
 
         }
 
-        return render(request, 'category_detail.html',context )
+        return render(request, 'category_detail.html', context)
+
 
 class MySearchView(SearchView):
 
     def build_page(self):
-        #分页重写
+        # 分页重写
         super(MySearchView, self).extra_context()
 
         try:
@@ -236,7 +252,6 @@ class MySearchView(SearchView):
 
         if page_no < 1:
             raise HttpResponse("Pages should be 1 or greater.")
-
 
         paginator = Paginator(self.results, HAYSTACK_SEARCH_RESULTS_PER_PAGE, request=self.request)
         page = paginator.page(page_no)

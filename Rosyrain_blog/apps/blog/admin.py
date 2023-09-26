@@ -3,6 +3,10 @@ from django.contrib import admin
 from apps.blog.models import Blog, Category, Tag, Comment, Counts
 
 
+# admin.site.site_header = '博客后台管理系统'
+# admin.site.index_title = '首页'
+
+
 class BlogAdmin(admin.ModelAdmin):
     list_display = ['title', 'click_count', 'category', 'create_time', 'update_time']
 
