@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import sys,os
+import configparser
+
+config = configparser.ConfigParser()
+config.read('./config/config.ini','UTF-8')
+# print(config.sections())
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -87,14 +93,14 @@ WSGI_APPLICATION = 'Rosyrain_blog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': "127.0.0.1",
-        'PORT': 3306,
-        'USER': "root",
-        "PASSWORD": "jx20031002",
-        "NAME": "Rosyrain_blog"
+        'HOST': config['database']['ip'],
+        'PORT': config['database']['port'],
+        'USER': config['database']['user'],
+        "PASSWORD": config['database']['pwd'],
+        "NAME": config['database']['db'],
   		  }
     }
-
+# print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -149,3 +155,6 @@ HAYSTACK_CONNECTIONS = {
 }
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+if __name__ == '__main__':
+    print(config.sections())
