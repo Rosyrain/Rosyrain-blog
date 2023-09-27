@@ -101,7 +101,7 @@
 
                         <div class="post-tags">
 
-                            <a href="http://www.geerniya.cn/tags/linux/" rel="tag"># linux</a>
+{#                            <a href="http://www.geerniya.cn/tags/linux/" rel="tag"># linux</a>#}
 
                         </div>
 
@@ -110,14 +110,14 @@
 
                                 {#                                #判断是否有上一篇#}
                                 {% if has_prev %}
-                                    <a href="{% url 'blog:blog_id' blog_prev.id %}" rel="prev"
+                                    <a href="{% url 'blog:blog_id' blog_prev.id %}" rel="prev" style="float: left"
                                        title="{{ blog_prev.title }}">
                                         <i class="fa fa-chevron-left"></i> {{ blog_prev.title }}
                                     </a>
                                 {% endif %}
                                 {#                                #判断是否有下一篇#}
                                 {% if has_next %}
-                                    <a href="{% url 'blog:blog_id' blog_next.id %}" rel="next"
+                                    <a href="{% url 'blog:blog_id' blog_next.id %}" rel="next" style="float: right"
                                        title="{{ blog_next.title }}">
                                         {{ blog_next.title }} <i class="fa fa-chevron-right"></i>
                                     </a>
