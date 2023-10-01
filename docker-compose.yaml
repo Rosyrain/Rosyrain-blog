@@ -6,6 +6,8 @@ services:
     tty: true
     networks:
       - blog_networks
+    ports:
+      - "8000:80"
   mysql:
     image: mysql:latest
     restart: always
