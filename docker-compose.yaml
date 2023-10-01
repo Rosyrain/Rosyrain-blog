@@ -1,23 +1,35 @@
 version: '3'
 services:
-  blog:
-    image: python:3.9.18-bullseye
-    command: /bin/bash -c "mkdir /app && git clone https://github.com/Rosyrain/Rosyrain-blog.git /app && /bin/bash"
-    tty: true
-    networks:
-      - blog_networks
-    ports:
-      - "8000:80"
   mysql:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: jx20031002
-      MYSQL_DATABASES: Rosyrain_blog
-      MYSQL_USER: rosyrain
-      MYSQL_PASSWORD: jx20031002
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWD}
+      - MYSQL_DATABASE=${DB_NAME}
     networks:
       - blog_networks
+
+  blog:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - DB_HOST=mysql
+        - DB_PORT=3306
+        - DB_NAME=${DB_NAME}
+        - DB_USER=root
+        - DB_PASSWD=${DB_PASSWD}
+    tty: true
+    networks:
+      - blog_networks
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - PORT=80
+    ports:
+      - "8000:80"
+    
 
 networks:
   blog_networks:
