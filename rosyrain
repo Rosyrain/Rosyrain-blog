@@ -110,7 +110,7 @@ function setup()
 function run()
 {
     cd $APP
-    python $APP/manage.py runserver
+    python $APP/manage.py runserver @$
 }
 
 case "$1" in
