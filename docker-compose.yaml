@@ -1,0 +1,23 @@
+version: '3'
+services:
+  blog:
+    image: python:3.9.18-bullseye
+    command: /bin/bash
+    tty: true
+    networks:
+      - blog_networks
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: jx20031002
+      MYSQL_DATABASES: Rosyrain_blog
+      MYSQL_USER: rosyrain
+      MYSQL_PASSWORD: jx20031002
+    networks:
+      - blog_networks
+
+networks:
+  blog_networks:
+
+

@@ -1,0 +1,106 @@
+#!/bin/bash
+
+export APP_HOME=$(dirname $(readlink -f $0))
+export APP=$APP_HOME/Rosyrain_blog
+export CONFIG=$APP/config/config.ini
+
+function err()
+{
+    echo -e "\e[31mERR: \e[33m$1\e[0m"
+}
+
+function msg()
+{
+    echo -e "\e[32mMSG: \e[0m$@\e[0m"
+}
+
+function write_ini_file()
+{
+    # 函数使用说明：
+    #   write_ini_file <文件> <节> <键> <值>
+    #   如果节或者键不存在，则添加
+    #   如果节、键存在，值不匹配，则更新
+    #   如果节、键、值均存在，则不做操作
+
+    allSections=$(awk -F '[][]' '/\[.*]/{print $2}' $1)
+    iniSections=(${allSections// /})
+    # 判断是否要新建item
+    itemFlag="0"
+    for temp in ${iniSections[@]};do
+        if [[ "${temp}" = "$2" ]];then
+            itemFlag="1"
+            break
+        fi
+    done
+
+    if [[ "$itemFlag" = "0" ]];then
+        echo "[$2]" >> $1
+    fi
+
+    # 加入或更新value
+    awk "/\[$2\]/{a=1}a==1" $1|sed -e '1d' -e '/^$/d'  -e 's/[ \t]*$//g' -e 's/^[ \t]*//g' -e '/\[/,$d'|grep "$3.\?=">/dev/null
+    if [[ "$?" -eq 0 ]];then
+        # 更新
+        # 找到指定item行号码
+        itemNum=$(sed -n -e "/\[$2\]/=" $1)
+        sed -i "${itemNum},/^\[.*\]/s/\($3.\?=\).*/\1$4/g" $1 >/dev/null 2>&1
+        # 如果替换失败，可能文件中有\，更换分隔符为!
+        if [[ "$?" -ne 0 ]];then
+            sed -i "${itemNum},/^\[.*\]/s!\($3.\?=\).*!\1$4!g" $1
+        fi
+    else
+        # 新增
+        sed -i "/^\[$2\]/a\\$3=$4" $1
+    fi
+}
+
+function read_value_from_ini()
+{
+    INIFILE=$1;
+    SECTION=$2;
+    ITEM=$3
+
+    tmpfile="/tmp/tmp.ini"
+    # 去掉配置文件中的注释行和空行，保存到tmpfile中。
+    sed '/^#/d;/^$/d' ${INIFILE} > ${tmpfile}
+
+    _readIni=`awk -F '=' '/\['${SECTION}'\]/{a=1}a==1&&$1~/'${ITEM}'/{print $2;exit}' ${tmpfile}`
+    echo ${_readIni}
+}
+
+
+function setup()
+{
+
+    echo $APP
+
+    msg 开始安装依赖
+    pip install -r $APP/requirements.txt
+    err=$?
+    if [ "$err" -ne "0" ]; then
+        err 安装依赖失败
+    else 
+        msg 安装依赖完成
+    fi
+    
+
+    write_ini_file $CONFIG database ip $DB_HOST
+    write_ini_file $CONFIG database port $DB_PORT
+    write_ini_file $CONFIG database user $DB_USER
+    write_ini_file $CONFIG database pwd $DB_PASSWD
+    write_ini_file $CONFIG database db $DB_NAME
+
+
+}
+
+case "$1" in
+    "setup")
+        shift 1
+        setup $@
+    ;;
+    "run")
+        echo 没搞好
+    ;;
+    *)
+        echo 参数错误
+esac
