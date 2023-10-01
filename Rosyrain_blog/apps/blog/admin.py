@@ -6,13 +6,6 @@ from apps.blog.models import Blog, Category, Tag, Comment, Counts
 # admin.site.site_header = '博客后台管理系统'
 # admin.site.index_title = '首页'
 
-Counts.objects.create(
-    id=1,
-    blog_nums = 0,
-    category_nums = 0,
-    tag_nums = 0,
-    visit_nums = 0,
-)
 
 class BlogAdmin(admin.ModelAdmin):
     list_display = ['title', 'click_count', 'category', 'create_time', 'update_time']
