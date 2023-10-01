@@ -157,9 +157,6 @@ case "$1" in
         shift 1
         run $@
     ;;
-    "test")
-        touch test.txt
-    ;;
     *)
         echo 参数错误
     ;;
