@@ -83,11 +83,11 @@ function setup()
         msg 安装依赖完成
     fi
 
-    #write_ini_file $CONFIG database ip $DB_HOST
-    #write_ini_file $CONFIG database port $DB_PORT
-    #write_ini_file $CONFIG database user $DB_USER
-    #write_ini_file $CONFIG database pwd $DB_PASSWD
-    #write_ini_file $CONFIG database db $DB_NAME
+    write_ini_file $CONFIG database ip $DB_HOST
+    write_ini_file $CONFIG database port $DB_PORT
+    write_ini_file $CONFIG database user $DB_USER
+    write_ini_file $CONFIG database pwd $DB_PASSWD
+    write_ini_file $CONFIG database db $DB_NAME
 
     msg 配置已保存
 

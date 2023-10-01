@@ -2,7 +2,7 @@ version: '3'
 services:
   blog:
     image: python:3.9.18-bullseye
-    command: /bin/bash
+    command: /bin/bash -c "mkdir /app && git clone https://github.com/Rosyrain/Rosyrain-blog.git /app && /bin/bash"
     tty: true
     networks:
       - blog_networks
