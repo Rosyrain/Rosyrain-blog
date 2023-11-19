@@ -26,9 +26,10 @@ services:
     depends_on:
       - mysql
     environment:
-      - PORT=80
+      - PORT=${WEB_PORT-8000}
     ports:
-      - "8000:80"
+      - "${WEB_PORT-8000}:${WEB_PORT-8000}"
+
     
 
 networks:

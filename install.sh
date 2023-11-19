@@ -1,8 +1,8 @@
 #!/bin/bash
-MY_ENVS=("$@")
-for MY_ENV_SET in "${MY_ENVS[@]}";do
-    ENV_CMD+="export $MY_ENV_SET "
-done
+# MY_ENVS=("$@")
+# for MY_ENV_SET in "${MY_ENVS[@]}";do
+#     ENV_CMD+="export $MY_ENV_SET "
+# done
 
 SLOGAN=$(
 cat << "EOF"
@@ -44,5 +44,4 @@ if [ ! -d "$DB_PASSWD" ];then
     done
     
 fi
-
 exec bash -c "$ENV_CMD && docker compose -p rosyain_blog up"
