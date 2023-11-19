@@ -58,7 +58,7 @@
 
 
                         <div class="post-body" itemprop="articleBody">
-                        {{ blog.content|safe }}
+                        {{ blog.content|safe|truncatewords:25 }}
                             <div class="post-button text-center">
                                 <a class="btn" href="{% url 'blog:blog_id' blog.id %}" rel="contents">
                                     阅读全文 »
