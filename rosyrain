@@ -3,6 +3,7 @@
 export APP_HOME=$(dirname $(readlink -f $0))
 export APP=$APP_HOME/Rosyrain_blog
 export CONFIG=$APP/config/config.ini
+export INITED_FLAG=$APP_HOME/.inited
 
 function err()
 {
@@ -12,6 +13,12 @@ function err()
 function msg()
 {
     echo -e "\e[32mMSG: \e[0m$@\e[0m"
+}
+
+function fail()
+{
+    err $@
+    exit 1
 }
 
 function write_ini_file()
@@ -71,14 +78,15 @@ function read_value_from_ini()
 
 function setup()
 {
-
-    echo $APP
+    echo ============
+    echo -e "HOST:\t$DB_HOST\nPORT:\t$DB_PORT\nUSER:\t$DB_USER\nPASSWD:\t$DB_PASSWD\nNAME:\t$DB_NAME"
+    echo ============
 
     msg 开始安装依赖
     pip install -r $APP/requirements.txt
     err=$?
     if [ "$err" -ne "0" ]; then
-        err 安装依赖失败
+        fail 安装依赖失败
     else
         msg 安装依赖完成
     fi
@@ -91,26 +99,54 @@ function setup()
 
     msg 配置已保存
 
-    msg 开始初始化
-    #
-    #ls $APP_HOME
-    #ls $APP
-    cd $APP
-    python $APP/manage.py makemigrations 
-    python $APP/manage.py migrate
-    EXIT_CODE=$?
-    if [ "$EXIT_CODE" -ne "0" ]; then
-        err 初始化失败
-    else
-        msg 初始化完成
-    fi
+    sleep 1
 
 }
 
 function run()
 {
-    cd $APP
-    python $APP/manage.py runserver @$
+    TIME_OUT=60
+    FAIL=1
+    WAITING=1
+    i=0
+    while [ "$WAITING" -eq "1" ]
+    do
+        nc -z $DB_HOST $DB_PORT -w 1
+        FAIL=$?
+        if [ "$FAIL" -eq "0" ];then
+            WAITING=0
+        else
+            let i+=1
+            msg "等待mysql ${i}s ..."
+            sleep 1
+            
+            if [ "$i" -gt "$TIME_OUT" ];then
+                WAITING=0
+                FAIL=1
+            fi
+        fi
+
+    done
+
+    if [ "$FAIL" -eq "1" ];then
+        fail mysql超时
+    else
+        init
+        cd $APP
+        python $APP/manage.py runserver "$@"
+    fi
+}
+
+function init()
+{
+    if [ ! -f "$INITED_FLAG" ]; then
+        msg 开始初始化
+        cd $APP
+        python $APP/manage.py makemigrations && python $APP/manage.py migrate || fail 初始化失败
+        msg 初始化完成
+        touch $INITED_FLAG
+    fi
+
 }
 
 case "$1" in
@@ -118,7 +154,7 @@ case "$1" in
         setup $@
     ;;
     "run")
-        shift 2
+        shift 1
         run $@
     ;;
     *)
