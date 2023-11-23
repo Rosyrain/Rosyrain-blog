@@ -44,4 +44,4 @@ if [ ! -d "$DB_PASSWD" ];then
     done
     
 fi
-exec bash -c "$ENV_CMD && docker compose -p rosyain_blog up"
+exec bash -c "$ENV_CMD && docker compose -p rosyrain_blog up"
