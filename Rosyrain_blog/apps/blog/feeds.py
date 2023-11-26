@@ -13,4 +13,4 @@ class BlogRssFeed(Feed):
     def item_description(self, item):
         return item.content
     def item_link(self, item):
-        return reverse('blog_id', args=[item.id,])
+        return reverse('blog:blog_id', args=[item.id,])
